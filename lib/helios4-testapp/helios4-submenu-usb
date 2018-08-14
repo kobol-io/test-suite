@@ -1,0 +1,117 @@
+#!/bin/bash
+
+helios4_usb_state[1]=off
+helios4_usb_state[2]=off
+helios4_usb_list="usb1 usb2"
+TASTORAGE_EXEC="tastorage"
+
+helios4_usb_test_run()
+{
+    echo "Starting $1"
+    $TASTORAGE_EXEC start $1
+    return 0
+}
+
+helios4_usb_test_stop()
+{
+    echo "Stopping $1"
+    $TASTORAGE_EXEC stop $1
+    return 0
+}
+
+helios4_usb_stop_all()
+{
+    for stop in $helios4_usb_list
+    do
+        helios4_usb_test_stop $stop
+    done
+}
+
+helios4_usb_test_apply()
+{
+    local list_stop list_start
+
+    clear
+
+    #set -x
+    if [[ $# -eq 0 ]]; then
+        return 0
+    fi
+
+    while (( "$#" )); do
+        list_start=$(echo "$list_start $1")
+        shift
+    done
+
+    # Get list of device to stop
+    for stop in $helios4_usb_list
+    do
+        is_stop=1
+        for start in $list_start
+        do
+            if [[ $stop = $start ]]; then
+                is_stop=0
+                break
+            fi
+        done
+
+        [[ $is_stop -eq 1 ]] && list_stop=$(echo "$list_stop $stop")
+    done
+
+    # Stop test
+    for stop in $list_stop
+    do
+        if [[ $stop = "usb1" ]]; then
+            helios4_usb_state[1]=off
+        else
+            helios4_usb_state[2]=off
+        fi
+
+        helios4_usb_test_stop $stop
+    done
+
+    # Start test
+    for start in $list_start
+    do
+        if [[ $start = "usb1" ]]; then
+            helios4_usb_state[1]=on
+        else
+            helios4_usb_state[2]=on
+        fi
+
+        helios4_usb_test_run $start
+    done
+    #set +x
+
+    return 0
+}
+
+helios4_usb_get_list()
+{
+    return 0
+}
+
+
+helios4_menu_usb()
+{
+    local returncode
+
+    while true
+    do
+        exec 3>&1
+        value=$(dialog --ok-label "Apply" \
+            --cancel-label "Return" \
+            --checklist "Select USB Port (U4) to test" \
+            10 50 2 \
+            "usb1" "Upper USB Port" ${helios4_usb_state[1]} \
+            "usb2" "Lower USB Port" ${helios4_usb_state[2]} \
+            2>&1 1>&3)
+
+        returncode=$?
+        exec 3>&-
+
+        [[ $returncode == $DIALOG_CANCEL || $returncode == $DIALOG_ESC ]] && clear && return 1
+
+        helios4_usb_test_apply $value
+    done
+}

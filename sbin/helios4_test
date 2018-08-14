@@ -1,0 +1,85 @@
+#!/bin/bash
+#  Kobol.io
+#  Test Application Suite
+#
+
+INSTALL_PATH="$(dirname $0)/"
+
+source "$INSTALL_PATH"../lib/helios4-testapp/helios4-module-cpu
+source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-sata
+source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-uSD
+source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-usb
+
+init_env()
+{
+    # Kill all running fio
+    pkill -f fio
+    pkill -f stress-ng
+
+    # Reset CPU Freq
+    helios4_cpu_freq_reset
+}
+
+restore_env()
+{
+    helios4_cpu_test_stop
+    helios4_sata_stop_all 2>&1 1>/dev/null
+    helios4_uSD_stop_all 2>&1 1>/dev/null
+    helios4_usb_stop_all 2>&1 1>/dev/null
+
+    helios4_cpu_freq_restore
+    clear
+}
+
+main()
+{
+    local returncode value
+
+    DIALOG_OK=0
+    DIALOG_CANCEL=1
+    DIALOG_ESC=255
+
+
+    ITEMS=()
+    ITEMS+=( "CPU"      "Run CPU Stress"  )
+    ITEMS+=( "SATA"     "Run SATA (U10-U13)test >>" )
+    ITEMS+=( "MicroSD"  "Run MicroSD (U3) test" )
+    ITEMS+=( "USB"      "Run USB Storage (U4) test >>" )
+    #ITEMS+=( "======="  "===============" )
+    ITEMS+=( "Status"   "Display test status" )
+
+    returncode=0
+    while test $returncode != $DIALOG_CANCEL && test $returncode != $DIALOG_ESC
+    do
+        #returncode=$?
+        exec 3>&1
+
+        value=$(dialog --title "Helios4 Test Suite" \
+            --ok-label "Select" --cancel-label "Exit" \
+            --menu "ini apa\nHelo\nah" \
+            16 50 20 "${ITEMS[@]}" \
+            2>&1 1>&3)
+
+        returncode=$?
+        exec 3>&-
+
+        case $value in
+        	"CPU")
+                helios4_menu_cpu
+	        	;;
+	        "SATA")
+                helios4_menu_sata
+	        	;;
+	        "MicroSD")
+                helios4_menu_uSD
+	        	;;
+	        "USB")
+                helios4_menu_usb
+	        	;;
+        esac
+    done
+}
+
+init_env
+main
+restore_env
