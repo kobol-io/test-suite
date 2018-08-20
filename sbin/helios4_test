@@ -5,7 +5,7 @@
 
 INSTALL_PATH="$(dirname $0)/"
 
-source "$INSTALL_PATH"../lib/helios4-testapp/helios4-module-cpu
+source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-cpu
 source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-sata
 source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-uSD
 source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-usb
