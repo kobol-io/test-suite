@@ -99,7 +99,7 @@ helios4_menu_usb()
     while true
     do
         exec 3>&1
-        value=$(dialog --ok-label "Apply" \
+        value=$(dialog --ascii-lines --ok-label "Apply" \
             --cancel-label "Return" \
             --checklist "Select USB Port (U4) to test" \
             10 50 2 \

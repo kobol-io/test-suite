@@ -30,14 +30,14 @@ helios4_uSD_stop_all()
 helios4_menu_uSD()
 {
     if [[ $helios4_uSD_state = "off" ]]; then
-        dialog --title "Please wait" --infobox \
-        "\nStarting microSD test" 5 20
-        helios4_uSD_test_run "microsd"
+        dialog --ascii-lines --title "Please wait" --infobox \
+        "\nStarting microSD test" 5 30
+        helios4_uSD_test_run "microsd" 2>&1 1>/dev/null
         sleep 2
     else
-        dialog --title "Please wait" --infobox \
-        "\nStopping microSD test" 5 20
-        helios4_uSD_test_stop "microsd"
+        dialog --ascii-lines --title "Please wait" --infobox \
+        "\nStopping microSD test" 5 30
+        helios4_uSD_test_stop "microsd" 2>&1 1>/dev/null
         sleep 2
     fi
 }

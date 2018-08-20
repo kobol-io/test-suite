@@ -120,7 +120,7 @@ helios4_menu_sata()
     while true
     do
         exec 3>&1
-        value=$(dialog --ok-label "Apply" \
+        value=$(dialog --ascii-lines --ok-label "Apply" \
             --cancel-label "Return" \
             --checklist "Select SATA Port to test" \
             12 50 6 \

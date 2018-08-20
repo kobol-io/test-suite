@@ -45,7 +45,6 @@ main()
     ITEMS+=( "SATA"     "Run SATA (U10-U13)test >>" )
     ITEMS+=( "MicroSD"  "Run MicroSD (U3) test" )
     ITEMS+=( "USB"      "Run USB Storage (U4) test >>" )
-    #ITEMS+=( "======="  "===============" )
     ITEMS+=( "Status"   "Display test status" )
 
     returncode=0
@@ -54,10 +53,10 @@ main()
         #returncode=$?
         exec 3>&1
 
-        value=$(dialog --title "Helios4 Test Suite" \
+        value=$(dialog --ascii-lines --title "Helios4 Test Suite" \
             --ok-label "Select" --cancel-label "Exit" \
-            --menu "ini apa\nHelo\nah" \
-            16 50 20 "${ITEMS[@]}" \
+            --menu "\nSimple User Interface to exercise Helios4 components.\n\nPlease select which component to test or select \"Status\"\nto display test status." \
+            16 60 20 "${ITEMS[@]}" \
             2>&1 1>&3)
 
         returncode=$?
