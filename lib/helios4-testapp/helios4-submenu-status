@@ -1,2 +1,84 @@
 #!/bin/bash
 
+
+WORKDIR="/run/helios4_test/status"
+
+status_monitor()
+{
+    devices="ata1 ata2 ata3 ata4 microsd usb1 usb2"
+    prev_status=()
+
+    for dev in $devices
+    do
+        status=$(tastorage status $dev)
+
+        # Workaround for tailboxbg, the file should contain at least 3 lines
+        echo "$status" >> ${WORKDIR}/status-test-$dev.log
+        echo "$status" >> ${WORKDIR}/status-test-$dev.log
+        echo "$status" >> ${WORKDIR}/status-test-$dev.log
+        prev_status+=("$status")
+    done
+
+    while [ true ]
+    do
+        index=0
+        for dev in $devices
+        do
+            status=$(tastorage status $dev)
+            if [[ ${prev_status[index]} != $status ]]; then
+                echo "$status" >> ${WORKDIR}/status-test-$dev.log
+                prev_status[$index]="$status"
+            fi
+
+            ((index++))
+        done
+
+        sleep 1
+    done
+}
+
+status_show()
+{
+    dialog  --ascii-lines --no-shadow \
+        --begin 0 0 --title "Status: CPU" \
+            --tailboxbg ${WORKDIR}/status-test-cpu.log 4 20 \
+        --and-widget \
+        --begin 0 0 --ascii-lines --title "Status: microsd" \
+            --tailboxbg ${WORKDIR}/status-test-microsd.log 4 20 \
+        --and-widget \
+        --begin 0 21 --ascii-lines --title "Status: ata1" \
+            --tailboxbg ${WORKDIR}/status-test-ata1.log 4 20 \
+        --and-widget \
+        --begin 4 21 --ascii-lines --title "Status: ata2" \
+            --tailboxbg ${WORKDIR}/status-test-ata2.log 4 20 \
+        --and-widget \
+        --begin 8 21 --ascii-lines --title "Status: ata3" \
+            --tailboxbg ${WORKDIR}/status-test-ata3.log 4 20 \
+        --and-widget \
+        --begin 12 21 --ascii-lines --title "Status: ata4" \
+            --tailboxbg ${WORKDIR}/status-test-ata4.log 4 20 \
+        --and-widget \
+        --begin 0 42 --ascii-lines --title "Status: usb1" \
+            --tailboxbg ${WORKDIR}/status-test-usb1.log 4 20 \
+        --and-widget \
+        --begin 4 42 --ascii-lines --title "Status: usb2" \
+            --tailboxbg ${WORKDIR}/status-test-usb2.log 4 20 \
+        --and-widget \
+        --begin 18 0 --no-shadow --ascii-lines --ok-label "Return" --msgbox "" 3 62
+}
+
+helios4_menu_status()
+{
+    [[ -d $WORKDIR ]] || mkdir -p ${WORKDIR}
+    # Disable CPU status
+    echo "N/A" >>${WORKDIR}/status-test-cpu.log
+
+    status_monitor &
+    pid_monitor=$!
+    sleep 0.5
+
+    status_show
+
+    kill $pid_monitor >/dev/null
+    rm -rf ${WORKDIR}
+}

@@ -9,6 +9,7 @@ source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-cpu
 source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-sata
 source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-uSD
 source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-usb
+source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-status
 
 init_env()
 {
@@ -39,9 +40,8 @@ main()
     DIALOG_CANCEL=1
     DIALOG_ESC=255
 
-
     ITEMS=()
-    ITEMS+=( "CPU"      "Run CPU Stress"  )
+    #ITEMS+=( "CPU"      "Run CPU Stress"  )
     ITEMS+=( "SATA"     "Run SATA (U10-U13)test >>" )
     ITEMS+=( "MicroSD"  "Run MicroSD (U3) test" )
     ITEMS+=( "USB"      "Run USB Storage (U4) test >>" )
@@ -50,7 +50,6 @@ main()
     returncode=0
     while test $returncode != $DIALOG_CANCEL && test $returncode != $DIALOG_ESC
     do
-        #returncode=$?
         exec 3>&1
 
         value=$(dialog --ascii-lines --title "Helios4 Test Suite" \
@@ -74,6 +73,9 @@ main()
 	        	;;
 	        "USB")
                 helios4_menu_usb
+	        	;;
+	        "Status")
+                helios4_menu_status
 	        	;;
         esac
     done

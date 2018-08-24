@@ -98,7 +98,7 @@ status_fio()
 {
     local PROC_PID
 
-    PROC_PID=$(cat $PIDFILE)
+    PROC_PID=$(cat $PIDFILE 2>/dev/null)
     if [[ -n "${PROC_PID}" ]] && [[ -d "/proc/${PROC_PID}" ]]; then
         echo "Running"
     else
