@@ -4,6 +4,8 @@
 #
 
 INSTALL_PATH="$(dirname $0)/"
+APP_NAME="Helios4 Test Suite"
+APP_VERSION="0.1"
 
 source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-cpu
 source "$INSTALL_PATH"../lib/helios4-testapp/helios4-submenu-sata
@@ -32,6 +34,12 @@ restore_env()
     clear
 }
 
+display_version()
+{
+    echo "$APP_NAME - Version $APP_VERSION"
+    exit 0
+}
+
 main()
 {
     local returncode value
@@ -52,7 +60,7 @@ main()
     do
         exec 3>&1
 
-        value=$(dialog --ascii-lines --title "Helios4 Test Suite" \
+        value=$(dialog --ascii-lines --title "$APP_NAME" \
             --ok-label "Select" --cancel-label "Exit" \
             --menu "\nSimple User Interface to exercise Helios4 components.\n\nPlease select which component to test or select \"Status\"\nto display test status." \
             16 60 20 "${ITEMS[@]}" \
@@ -80,6 +88,25 @@ main()
         esac
     done
 }
+
+if [ "$#" -gt 0 ]; then
+    OPTIONS=$(getopt -o v -l version -- "$@")
+    eval set -- "$OPTIONS"
+
+    while [ ! -z "$1" ]
+    do
+        case "$1" in
+            -v | --version )
+                display_version
+                ;;
+            *)
+                exit 1
+                ;;
+        esac
+
+        shift
+    done
+fi
 
 init_env
 main
