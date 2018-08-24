@@ -77,7 +77,11 @@ run_fio()
     find_block_dev $1
     [[ -z ${DEV_UT} ]] && { echo no device found; exit 1; }
 
-    fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=test --filename=/dev/${DEV_UT} --bs=4k --iodepth=32 --size=4G --readwrite=randread --readonly --loops=999 > /run/fio_test_${DEV_UT}.log 2>&1 &
+    fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 \
+        --name=test --filename=/dev/${DEV_UT} \
+        --bs=4k --iodepth=32 --size=4G --readwrite=randread --readonly \
+        --loops=999 --rate_iops=50 > /run/fio_test_${DEV_UT}.log 2>&1 &
+
     PROC_PID=$!
     echo ${PROC_PID} > $PIDFILE
     #echo "pid=${PROC_PID}"
