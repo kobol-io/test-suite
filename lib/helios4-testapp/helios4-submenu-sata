@@ -117,6 +117,11 @@ helios4_menu_sata()
 {
     local returncode
 
+    if [ "$1" = "all" ]; then
+        helios4_sata_test_apply $helios4_sata_list
+        return 0
+    fi
+
     while true
     do
         exec 3>&1

@@ -40,6 +40,13 @@ display_version()
     exit 0
 }
 
+start_all()
+{
+    helios4_menu_sata all
+    helios4_menu_uSD all
+    helios4_menu_usb all
+}
+
 main()
 {
     local returncode value
@@ -47,6 +54,11 @@ main()
     DIALOG_OK=0
     DIALOG_CANCEL=1
     DIALOG_ESC=255
+
+    if [[ "$ALL_TEST" = true ]]; then
+        start_all
+        EXTRAARGS="--default-item Status"
+    fi
 
     ITEMS=()
     #ITEMS+=( "CPU"      "Run CPU Stress"  )
@@ -61,6 +73,7 @@ main()
         exec 3>&1
 
         value=$(dialog --ascii-lines --title "$APP_NAME" \
+            $EXTRAARGS \
             --ok-label "Select" --cancel-label "Exit" \
             --menu "\nSimple User Interface to exercise Helios4 components.\n\nPlease select which component to test or select \"Status\"\nto display test status." \
             16 60 20 "${ITEMS[@]}" \
@@ -86,11 +99,12 @@ main()
                 helios4_menu_status
 	        	;;
         esac
+        EXTRAARGS=""
     done
 }
 
 if [ "$#" -gt 0 ]; then
-    OPTIONS=$(getopt -o v -l version -- "$@")
+    OPTIONS=$(getopt -o "va" -l "version,all" -- "$@")
     eval set -- "$OPTIONS"
 
     while [ ! -z "$1" ]
@@ -98,6 +112,10 @@ if [ "$#" -gt 0 ]; then
         case "$1" in
             -v | --version )
                 display_version
+                ;;
+            -a | --all )
+                ALL_TEST=true
+                break
                 ;;
             *)
                 exit 1

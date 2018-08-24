@@ -96,6 +96,11 @@ helios4_menu_usb()
 {
     local returncode
 
+    if [ "$1" = "all" ]; then
+        helios4_usb_test_apply $helios4_usb_list
+        return 0
+    fi
+
     while true
     do
         exec 3>&1
