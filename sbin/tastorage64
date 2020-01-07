@@ -1,0 +1,149 @@
+#!/bin/bash
+
+EXECNAME=$(basename $0)
+WORKDIR="/run/helios4_test"
+DEVICE_LIST="ata1 ata2 ata3 ata4 microsd usb1 usb2"
+DEV_UT=""
+FORCE_RUN=0
+
+
+find_block_dev()
+{
+    local dev dev_to_find dev_fullpath
+    #DEV_UT=sdc
+
+    dev_to_find=$1
+
+    # Map to actual expected dev path
+    case ${dev_to_find} in
+        microsd)
+            dev_to_find="mmc0"
+            ;;
+        usb1)
+            dev_to_find="f10f8000.usb3"
+            ;;
+        usb2)
+            dev_to_find="f10f0000.usb3"
+            ;;
+    esac
+
+    for dev in $(ls --hide="loop*" --hide="md*" /sys/block); do
+        # Filter out device
+        #[[ $dev = "loop"* ]] && continue
+        #[[ $dev = "md"* ]] && continue
+
+        dev_fullpath=$(readlink -f "/sys/block/$dev")
+        if [[ ${dev_fullpath} = *"${dev_to_find}"* ]]; then
+            DEV_UT=$dev
+            break
+        fi
+    done
+}
+
+check_device_name()
+{
+    local dev devname
+
+    devname=$1
+    for dev in ${DEVICE_LIST}; do
+        [[ $devname = $dev ]] && return 0
+    done
+
+    echo "DEVICE unknown"
+    return 1
+}
+
+check_instance()
+{
+    local PROC_PID
+
+    if [[ -e $PIDFILE ]]; then
+        PROC_PID=$(cat $PIDFILE)
+        if [[ -n "${PROC_PID}" ]] && [[ -d "/proc/${PROC_PID}" ]]; then
+            echo "Another test already running"
+            exit 1
+        fi
+    fi
+}
+
+run_fio()
+{
+    local PROC_PID
+
+    if [[ ${FORCE_RUN} -ne 1 ]]; then
+        check_instance
+    fi
+
+    find_block_dev $1
+    [[ -z ${DEV_UT} ]] && { echo no device found; exit 1; }
+
+    fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 \
+        --name=test --filename=/dev/${DEV_UT} \
+        --bs=4k --iodepth=32 --size=4G --readwrite=randread --readonly \
+        --loops=999 --rate_iops=50 > /run/fio_test_${DEV_UT}.log 2>&1 &
+
+    PROC_PID=$!
+    echo ${PROC_PID} > $PIDFILE
+    #echo "pid=${PROC_PID}"
+}
+
+stop_fio()
+{
+    local PROC_PID
+
+    PROC_PID=$(cat $PIDFILE 2>/dev/null)
+    if [[ -n "${PROC_PID}" ]]; then
+        kill ${PROC_PID}
+        rm -f $PIDFILE
+    fi
+}
+
+status_fio()
+{
+    local PROC_PID
+
+    PROC_PID=$(cat $PIDFILE 2>/dev/null)
+    if [[ -n "${PROC_PID}" ]] && [[ -d "/proc/${PROC_PID}" ]]; then
+        echo "Running"
+    else
+        echo "Stopped"
+    fi
+}
+
+
+show_help()
+{
+    echo "Usage: ${EXEC_NAME} {start|stop|status} {DEVICE}"
+    echo
+    echo "       DEVICE LIST"
+    echo "       ==========="
+    for dev in ${DEVICE_LIST}; do
+        echo "       $dev"
+    done
+    echo
+}
+
+
+[[ -d $WORKDIR ]] || mkdir -p ${WORKDIR}
+
+[[ $# -ne 2 ]] && { show_help; exit 1;}
+device_name=$2
+check_device_name ${device_name}
+[[ $? -eq 0 ]] || { show_help; exit 1;}
+
+PIDFILE="${WORKDIR}/${EXECNAME}_${device_name}.pid"
+case "$1" in
+    start)
+        run_fio ${device_name}
+        ;;
+    stop)
+        stop_fio ${device_name}
+        ;;
+    status)
+        status_fio ${device_name}
+        ;;
+    *)
+        show_help
+        exit 1
+        ;;
+esac
