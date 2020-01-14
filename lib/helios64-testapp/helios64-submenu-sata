@@ -4,8 +4,9 @@ helios64_sata_state[1]=off
 helios64_sata_state[2]=off
 helios64_sata_state[3]=off
 helios64_sata_state[4]=off
+helios64_sata_state[5]=off
 
-helios64_sata_list="ata1 ata2 ata3 ata4"
+helios64_sata_list="ata1 ata2 ata3 ata4 ata5"
 TASTORAGE_EXEC="tastorage64"
 
 helios64_sata_test_run()
@@ -77,6 +78,9 @@ helios64_sata_test_apply()
             "ata4")
                helios64_sata_state[4]=off
                ;;
+            "ata5")
+               helios64_sata_state[5]=off
+               ;;
         esac
 
         helios64_sata_test_stop $stop
@@ -97,6 +101,9 @@ helios64_sata_test_apply()
                ;;
             "ata4")
                helios64_sata_state[4]=on
+               ;;
+            "ata5")
+               helios64_sata_state[5]=on
                ;;
         esac
 
@@ -129,10 +136,11 @@ helios64_menu_sata()
             --cancel-label "Return" \
             --checklist "Select SATA Port to test" \
             12 50 6 \
-            "ata1" "Port 0 SATA1 (U10)" ${helios64_sata_state[1]} \
-            "ata2" "Port 1 SATA2 (U11)" ${helios64_sata_state[2]} \
-            "ata3" "Port 2 SATA3 (U12)" ${helios64_sata_state[3]} \
-            "ata4" "Port 3 SATA4 (U13)" ${helios64_sata_state[4]} \
+            "ata1" "Port 0 SATA1 (J3)/ M.2 SATA (J2)" ${helios64_sata_state[1]} \
+            "ata2" "Port 1 SATA2 (J4)" ${helios64_sata_state[2]} \
+            "ata3" "Port 2 SATA3 (J5)" ${helios64_sata_state[3]} \
+            "ata4" "Port 3 SATA4 (J6)" ${helios64_sata_state[4]} \
+            "ata5" "Port 4 SATA5 (J8)" ${helios64_sata_state[5]} \
             2>&1 1>&3)
 
         returncode=$?

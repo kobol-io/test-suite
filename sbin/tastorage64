@@ -2,7 +2,7 @@
 
 EXECNAME=$(basename $0)
 WORKDIR="/run/helios4_test"
-DEVICE_LIST="ata1 ata2 ata3 ata4 microsd usb1 usb2"
+DEVICE_LIST="ata1 ata2 ata3 ata4 ata5 microsd usb1 usb2 usb3"
 DEV_UT=""
 FORCE_RUN=0
 
