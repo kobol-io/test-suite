@@ -5,7 +5,7 @@ WORKDIR="/run/helios64_test/status"
 
 status_monitor()
 {
-    devices="ata1 ata2 ata3 ata4 ata5 microsd usb1 usb2 usb3"
+    devices="ata1 ata2 ata3 ata4 ata5 microsd emmc usb1 usb2 usb3"
     prev_status=()
 
     for dev in $devices
@@ -43,8 +43,11 @@ status_show()
         --begin 0 0 --title "Status: CPU" \
             --tailboxbg ${WORKDIR}/status-test-cpu.log 4 20 \
         --and-widget \
-        --begin 0 0 --ascii-lines --title "Status: microsd" \
+        --begin 4 0 --ascii-lines --title "Status: microSD" \
             --tailboxbg ${WORKDIR}/status-test-microsd.log 4 20 \
+        --and-widget \
+        --begin 8 0 --ascii-lines --title "Status: eMMC" \
+            --tailboxbg ${WORKDIR}/status-test-emmc.log 4 20 \
         --and-widget \
         --begin 0 21 --ascii-lines --title "Status: ata1" \
             --tailboxbg ${WORKDIR}/status-test-ata1.log 4 20 \

@@ -10,6 +10,7 @@ APP_VERSION="0.1"
 source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-cpu
 source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-sata
 source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-uSD
+source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-emmc
 source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-usb
 source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-status
 
@@ -28,6 +29,7 @@ restore_env()
     helios64_cpu_test_stop
     helios64_sata_stop_all 2>&1 1>/dev/null
     helios64_uSD_stop_all 2>&1 1>/dev/null
+    helios64_emmc_stop_all 2>&1 1>/dev/null
     helios64_usb_stop_all 2>&1 1>/dev/null
 
     helios64_cpu_freq_restore
@@ -44,6 +46,7 @@ start_all()
 {
     helios64_menu_sata all
     helios64_menu_uSD all
+    helios64_menu_emmc all
     helios64_menu_usb all
 }
 
@@ -93,6 +96,9 @@ main()
 	        	;;
 	        "MicroSD")
                 helios64_menu_uSD
+	        	;;
+	        "eMMC")
+                helios64_menu_emmc
 	        	;;
 	        "USB")
                 helios64_menu_usb
