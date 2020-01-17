@@ -1,7 +1,7 @@
 #!/bin/bash
 
 EXECNAME=$(basename $0)
-WORKDIR="/run/helios4_test"
+WORKDIR="/run/helios64_test"
 DEVICE_LIST="ata1 ata2 ata3 ata4 ata5 microsd emmc usb1 usb2 usb3"
 DEV_UT=""
 FORCE_RUN=0

@@ -80,7 +80,7 @@ helios64_usb_test_apply()
     # Start test
     for start in $list_start
     do
-        case $stop in
+        case $start in
             "usb1")
                helios64_usb_state[1]=on
                ;;
