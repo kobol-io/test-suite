@@ -12,6 +12,7 @@ source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-sata
 source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-uSD
 source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-emmc
 source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-usb
+source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-typec
 source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-status
 
 init_env()
@@ -81,7 +82,7 @@ main()
             $EXTRAARGS \
             --ok-label "Select" --cancel-label "Exit" \
             --menu "\nSimple User Interface to exercise Helios64 components.\n\nPlease select which component to test or select \"Status\"\nto display test status." \
-            16 60 20 "${ITEMS[@]}" \
+            18 60 20 "${ITEMS[@]}" \
             2>&1 1>&3)
 
         returncode=$?
@@ -102,6 +103,9 @@ main()
 	        	;;
 	        "USB")
                 helios64_menu_usb
+	        	;;
+	        "TypeC")
+                helios64_menu_typec
 	        	;;
 	        "Status")
                 helios64_menu_status

@@ -5,12 +5,16 @@ WORKDIR="/run/helios64_test/status"
 
 status_monitor()
 {
-    devices="ata1 ata2 ata3 ata4 ata5 microsd emmc usb1 usb2 usb3"
+    devices="ata1 ata2 ata3 ata4 ata5 microsd emmc usb1 usb2 usb3 usb4 dp"
     prev_status=()
 
     for dev in $devices
     do
-        status=$(tastorage64 status $dev)
+        if [[ $dev == "dp" ]]; then
+            status=$(tagpu status)
+        else
+            status=$(tastorage64 status $dev)
+        fi
 
         # Workaround for tailboxbg, the file should contain at least 3 lines
         echo "$status" >> ${WORKDIR}/status-test-$dev.log
@@ -24,7 +28,12 @@ status_monitor()
         index=0
         for dev in $devices
         do
-            status=$(tastorage64 status $dev)
+            if [[ $dev == "dp" ]]; then
+                status=$(tagpu status)
+            else
+                status=$(tastorage64 status $dev)
+            fi
+
             if [[ ${prev_status[index]} != $status ]]; then
                 echo "$status" >> ${WORKDIR}/status-test-$dev.log
                 prev_status[$index]="$status"
@@ -48,6 +57,12 @@ status_show()
         --and-widget \
         --begin 8 0 --ascii-lines --title "Status: eMMC" \
             --tailboxbg ${WORKDIR}/status-test-emmc.log 4 20 \
+        --and-widget \
+        --begin 12 0 --ascii-lines --title "Status: Type-C Host" \
+            --tailboxbg ${WORKDIR}/status-test-usb4.log 4 20 \
+        --and-widget \
+        --begin 16 0 --ascii-lines --title "Status: Type-C DP" \
+            --tailboxbg ${WORKDIR}/status-test-dp.log 4 20 \
         --and-widget \
         --begin 0 21 --ascii-lines --title "Status: ata1" \
             --tailboxbg ${WORKDIR}/status-test-ata1.log 4 20 \
@@ -73,7 +88,7 @@ status_show()
         --begin 8 42 --ascii-lines --title "Status: usb3" \
             --tailboxbg ${WORKDIR}/status-test-usb3.log 4 20 \
         --and-widget \
-        --begin 18 0 --no-shadow --ascii-lines --ok-label "Return" --msgbox "" 3 62
+        --begin 20 0 --no-shadow --ascii-lines --ok-label "Return" --msgbox "" 3 62
 }
 
 helios64_menu_status()

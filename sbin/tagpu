@@ -1,0 +1,82 @@
+#!/bin/bash
+
+EXECNAME=$(basename $0)
+WORKDIR="/run/helios64_test"
+FORCE_RUN=0
+DISPLAY_PATH=":0.0"
+
+check_instance()
+{
+    local PROC_PID
+
+    if [[ -e $PIDFILE ]]; then
+        PROC_PID=$(cat $PIDFILE)
+        if [[ -n "${PROC_PID}" ]] && [[ -d "/proc/${PROC_PID}" ]]; then
+            echo "Another test already running"
+            exit 1
+        fi
+    fi
+}
+
+run_gpu()
+{
+    local PROC_PID
+
+    if [[ ${FORCE_RUN} -ne 1 ]]; then
+        check_instance
+    fi
+
+    DISPLAY="${DISPLAY_PATH}" glmark2 --fullscreen --annotate --run-forever \
+    > /run/glx_test_$(date +%Y%m%d_%H%M%S).log 2>&1 &
+
+    PROC_PID=$!
+    echo ${PROC_PID} > $PIDFILE
+    #echo "pid=${PROC_PID}"
+}
+
+stop_gpu()
+{
+    local PROC_PID
+
+    PROC_PID=$(cat $PIDFILE 2>/dev/null)
+    if [[ -n "${PROC_PID}" ]]; then
+        kill ${PROC_PID}
+        rm -f $PIDFILE
+    fi
+}
+
+status_gpu()
+{
+    local PROC_PID
+
+    PROC_PID=$(cat $PIDFILE 2>/dev/null)
+    if [[ -n "${PROC_PID}" ]] && [[ -d "/proc/${PROC_PID}" ]]; then
+        echo "Running"
+    else
+        echo "Stopped"
+    fi
+}
+
+show_help()
+{
+    echo "Usage: ${EXEC_NAME} {start|stop|status}"
+    echo
+}
+
+[[ -d $WORKDIR ]] || mkdir -p ${WORKDIR}
+PIDFILE="${WORKDIR}/${EXECNAME}.pid"
+case "$1" in
+    start)
+        run_gpu
+        ;;
+    stop)
+        stop_gpu
+        ;;
+    status)
+        status_gpu
+        ;;
+    *)
+        show_help
+        exit 1
+        ;;
+esac
