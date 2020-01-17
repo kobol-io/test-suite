@@ -37,20 +37,6 @@ or
 $ sudo helios4_test --all
 ```
 
-## SCREENSHOT
-### Main menu
-![Main menu](images/menu_main.png)
-
-### SATA submenu
-![SATA submenu](images/menu_sata.png)
-
-### USB submenu
-![USB submenu](images/menu_usb.png)
-
-### Status
-![Status](images/menu_status.png)
-
-
 ### Helios64
 
 Run helios64_test as superuser
@@ -73,16 +59,34 @@ $ sudo helios64_test --all
 ```
 
 ## SCREENSHOT
-### Main menu
+
+### Helios4
+#### Main menu
 ![Main menu](images/menu_main.png)
 
-### SATA submenu
+#### SATA submenu
 ![SATA submenu](images/menu_sata.png)
 
-### USB submenu
+#### USB submenu
 ![USB submenu](images/menu_usb.png)
 
-### Status
+#### Status
 ![Status](images/menu_status.png)
+
+### Helios64
+#### Main menu
+![Main menu](images/menu_helios64_main.png)
+
+#### SATA submenu
+![SATA submenu](images/menu_helios64_sata.png)
+
+#### USB submenu
+![USB submenu](images/menu_helios64_usb.png)
+
+#### USB Type-C submenu
+![TypeC submenu](images/menu_helios64_typec.png)
+
+#### Status
+![Status](images/menu_helios64_status.png)
 
 
