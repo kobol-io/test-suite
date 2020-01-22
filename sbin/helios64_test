@@ -20,6 +20,7 @@ init_env()
     # Kill all running fio
     pkill -f fio
     pkill -f stress-ng
+    pkill -f glmark2
 
     # Reset CPU Freq
     helios64_cpu_freq_reset
@@ -32,6 +33,7 @@ restore_env()
     helios64_uSD_stop_all 2>&1 1>/dev/null
     helios64_emmc_stop_all 2>&1 1>/dev/null
     helios64_usb_stop_all 2>&1 1>/dev/null
+    helios64_typec_stop_all 2>&1 1>/dev/null
 
     helios64_cpu_freq_restore
     clear
