@@ -2,17 +2,18 @@
 
 EXECNAME=$(basename $0)
 WORKDIR="/run/helios64_test"
-DEVICE_LIST="ata1 ata2 ata3 ata4 ata5 microsd emmc usb1 usb2 usb3"
+DEVICE_LIST="ata1 ata2 ata3 ata4 ata5 microsd emmc usb1 usb2 usb3 usb4"
 DEV_UT=""
 FORCE_RUN=0
 
 
 find_block_dev()
 {
-    local dev dev_to_find dev_fullpath
+    local dev dev_to_find dev_fullpath sibling_dev
     #DEV_UT=sdc
 
     dev_to_find=$1
+    sibling_dev=""
 
     # Map to actual expected dev path
     case ${dev_to_find} in
@@ -23,22 +24,41 @@ find_block_dev()
             dev_to_find="mmc1"
             ;;
         usb1)
-            dev_to_find="f10f8000.usb3"
+            dev_to_find="4-1.1:1.0"
+            sibling_dev="3-1.1:1.0"
             ;;
         usb2)
-            dev_to_find="f10f0000.usb3"
+            dev_to_find="4-1.2:1.0"
+            sibling_dev="3-1.2:1.0"
+            ;;
+        usb3)
+            dev_to_find="4-1.3:1.0"
+            sibling_dev="3-1.3:1.0"
+            ;;
+        usb4)
+            dev_to_find="8-1:1.0"
+            sibling_dev="7-1:1.0"
             ;;
     esac
 
-    for dev in $(ls --hide="loop*" --hide="md*" /sys/block); do
-        # Filter out device
-        #[[ $dev = "loop"* ]] && continue
-        #[[ $dev = "md"* ]] && continue
+    for dev in $(ls /sys/block \
+                --hide="loop*" \
+                --hide="md*" \
+                --hide="zram*" \
+                --hide="ram*" \
+                --hide="mtd*"); do
 
         dev_fullpath=$(readlink -f "/sys/block/$dev")
         if [[ ${dev_fullpath} = *"${dev_to_find}"* ]]; then
             DEV_UT=$dev
             break
+        else
+            # Try to look on sibling bus
+            [[ -z ${sibling_dev} ]] && continue
+            if [[ ${dev_fullpath} = *"${sibling_dev}"* ]]; then
+                DEV_UT=$dev
+                break
+            fi
         fi
     done
 }
