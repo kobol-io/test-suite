@@ -8,6 +8,8 @@ TASTORAGE_EXEC="tastorage64"
 
 helios64_typec_dp_test_run()
 {
+    startx > /dev/null 2>&1 &
+    sleep 2
     echo "Starting GPU"
     $TAGPU_EXEC start
     return 0
@@ -17,6 +19,7 @@ helios64_typec_dp_test_stop()
 {
     echo "Stopping GPU"
     $TAGPU_EXEC stop
+    pkill -f xinit
     return 0
 }
 
