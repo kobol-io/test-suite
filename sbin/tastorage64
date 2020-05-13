@@ -15,6 +15,26 @@ find_block_dev()
     dev_to_find=$1
     sibling_dev=""
 
+    # get USB bus of internal USB Hub
+    usb1="/sys/devices/platform/usb1/fe900000.dwc3/xhci-hcd.*.auto/usb?/"
+    typec1=()
+    for bus in $usb1; do
+        typec1+=( "$bus" )
+    done
+
+    typec1_usb2="${typec1[0]}"
+    typec1_usb3="${typec1[1]}"
+
+    # get USB bus of type C
+    usb0="/sys/devices/platform/usb0/fe800000.dwc3/xhci-hcd.*.auto/usb?/"
+    typec0=()
+    for bus in $usb0; do
+        typec0+=( "$bus" )
+    done
+
+    typec0_usb2="${typec0[0]}"
+    typec0_usb3="${typec0[1]}"
+
     # Map to actual expected dev path
     case ${dev_to_find} in
         microsd)
@@ -24,20 +44,20 @@ find_block_dev()
             dev_to_find="mmc1"
             ;;
         usb1)
-            dev_to_find="4-1.1:1.0"
-            sibling_dev="3-1.1:1.0"
+            dev_to_find="${typec1_usb3: -2:-1}-1.1:1.0"
+            sibling_dev="${typec1_usb2: -2:-1}-1.1:1.0"
             ;;
         usb2)
-            dev_to_find="4-1.2:1.0"
-            sibling_dev="3-1.2:1.0"
+            dev_to_find="${typec1_usb3: -2:-1}-1.2:1.0"
+            sibling_dev="${typec1_usb2: -2:-1}-1.2:1.0"
             ;;
         usb3)
-            dev_to_find="4-1.3:1.0"
-            sibling_dev="3-1.3:1.0"
+            dev_to_find="${typec1_usb3: -2:-1}-1.3:1.0"
+            sibling_dev="${typec1_usb2: -2:-1}-1.3:1.0"
             ;;
         usb4)
-            dev_to_find="8-1:1.0"
-            sibling_dev="7-1:1.0"
+            dev_to_find="${typec0_usb3: -2:-1}-1:1.0"
+            sibling_dev="${typec0_usb2: -2:-1}-1:1.0"
             ;;
     esac
 
