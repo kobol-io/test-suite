@@ -1,0 +1,136 @@
+#!/bin/bash
+
+helios64_usb_state[1]=off
+helios64_usb_state[2]=off
+helios64_usb_state[3]=off
+helios64_usb_list="usb1 usb2 usb3"
+TASTORAGE_EXEC="tastorage64"
+
+helios64_usb_test_run()
+{
+    echo "Starting $1"
+    $TASTORAGE_EXEC start $1
+    return 0
+}
+
+helios64_usb_test_stop()
+{
+    echo "Stopping $1"
+    $TASTORAGE_EXEC stop $1
+    return 0
+}
+
+helios64_usb_stop_all()
+{
+    for stop in $helios64_usb_list
+    do
+        helios64_usb_test_stop $stop
+    done
+}
+
+helios64_usb_test_apply()
+{
+    local list_stop list_start
+
+    clear
+
+    #set -x
+    if [[ $# -eq 0 ]]; then
+        return 0
+    fi
+
+    while (( "$#" )); do
+        list_start=$(echo "$list_start $1")
+        shift
+    done
+
+    # Get list of device to stop
+    for stop in $helios64_usb_list
+    do
+        is_stop=1
+        for start in $list_start
+        do
+            if [[ $stop = $start ]]; then
+                is_stop=0
+                break
+            fi
+        done
+
+        [[ $is_stop -eq 1 ]] && list_stop=$(echo "$list_stop $stop")
+    done
+
+    # Stop test
+    for stop in $list_stop
+    do
+		case $stop in
+            "usb1")
+               helios64_usb_state[1]=off
+               ;;
+            "usb2")
+               helios64_usb_state[2]=off
+               ;;
+            "usb3")
+               helios64_usb_state[3]=off
+               ;;
+        esac
+
+        helios64_usb_test_stop $stop
+    done
+
+    # Start test
+    for start in $list_start
+    do
+        case $start in
+            "usb1")
+               helios64_usb_state[1]=on
+               ;;
+            "usb2")
+               helios64_usb_state[2]=on
+               ;;
+            "usb3")
+               helios64_usb_state[3]=on
+               ;;
+        esac
+
+        helios64_usb_test_run $start
+    done
+    #set +x
+
+    return 0
+}
+
+helios64_usb_get_list()
+{
+    return 0
+}
+
+
+helios64_menu_usb()
+{
+    local returncode
+
+    if [ "$1" = "all" ]; then
+        helios64_usb_test_apply $helios64_usb_list
+        return 0
+    fi
+
+    while true
+    do
+        exec 3>&1
+        value=$(dialog --ascii-lines --ok-label "Apply" \
+            --cancel-label "Return" \
+            --checklist "Select USB Port (J1 & J13) to test" \
+            10 50 4 \
+            "usb1" "Back Panel Upper USB Port" ${helios64_usb_state[1]} \
+            "usb2" "Back Panel Lower USB Port" ${helios64_usb_state[2]} \
+            "usb3" "Front Panel USB Port" ${helios64_usb_state[3]} \
+            2>&1 1>&3)
+
+        returncode=$?
+        exec 3>&-
+
+        [[ $returncode == $DIALOG_CANCEL || $returncode == $DIALOG_ESC ]] && clear && return 1
+
+        helios64_usb_test_apply $value
+    done
+}

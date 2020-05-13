@@ -1,0 +1,43 @@
+#!/bin/bash
+helios64_uSD_state=off
+helios64_uSD_list="microsd"
+TASTORAGE_EXEC="tastorage64"
+
+helios64_uSD_test_run()
+{
+    echo "Starting $1"
+    $TASTORAGE_EXEC start $1
+    helios64_uSD_state=on
+    return 0
+}
+
+helios64_uSD_test_stop()
+{
+    echo "Stopping $1"
+    $TASTORAGE_EXEC stop $1
+    helios64_uSD_state=off
+    return 0
+}
+
+helios64_uSD_stop_all()
+{
+    for stop in $helios64_uSD_list
+    do
+        helios64_uSD_test_stop $stop
+    done
+}
+
+helios64_menu_uSD()
+{
+    if [[ $helios64_uSD_state = "off" ]]; then
+        dialog --ascii-lines --title "Please wait" --infobox \
+        "\nStarting microSD test" 5 30
+        helios64_uSD_test_run "microsd" 2>&1 1>/dev/null
+        sleep 2
+    else
+        dialog --ascii-lines --title "Please wait" --infobox \
+        "\nStopping microSD test" 5 30
+        helios64_uSD_test_stop "microsd" 2>&1 1>/dev/null
+        sleep 2
+    fi
+}

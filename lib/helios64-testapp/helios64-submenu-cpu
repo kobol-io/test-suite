@@ -1,0 +1,70 @@
+#!/bin/bash
+
+
+EXECNAME=tacpu
+WORKDIR="/run/helios64_test"
+PIDFILE="${WORKDIR}/${EXECNAME}.pid"
+
+helios64_cpu_state=off
+
+helios64_cpu_freq_reset()
+{
+    cpufreq-set -r -g performance -c 0
+    cpufreq-set -r -g performance -c 4
+}
+
+helios64_cpu_freq_restore()
+{
+    cpufreq-set -r -g ondemand -c 0
+    cpufreq-set -r -g ondemand -c 4
+}
+
+helios64_cpu_test_run()
+{
+    local PROC_PID
+
+    [[ -d $WORKDIR ]] || mkdir -p ${WORKDIR}
+    stress-ng --cpu $(nproc) --cpu-load 90 2>&1 &
+    PROC_PID=$!
+    echo ${PROC_PID} > $PIDFILE
+
+    helios64_cpu_state=on
+}
+
+helios64_cpu_test_stop()
+{
+    local PROC_PID
+
+    PROC_PID=$(cat $PIDFILE 2>/dev/null)
+    if [[ -n "${PROC_PID}" ]]; then
+        kill ${PROC_PID}
+        pkill -f stress-ng
+        rm -f $PIDFILE
+    fi
+
+    helios64_cpu_state=off
+}
+
+helios64_cpu_test_status()
+{
+    if [[ $helios64_cpu_state = "off" ]]; then
+        echo "Stopped"
+    else
+        echo "Running"
+    fi
+}
+
+helios64_menu_cpu()
+{
+    if [[ $helios64_cpu_state = "off" ]]; then
+        dialog --ascii-lines --title "Please wait" --infobox \
+            "\nStarting CPU burn test" 5 30
+        helios64_cpu_test_run 2>&1 1>/dev/null
+        sleep 2
+    else
+        dialog --ascii-lines --title "Please wait" --infobox \
+            "\nStopping CPU burn test" 5 30
+        helios64_cpu_test_stop 2>&1 1>/dev/null
+        sleep 2
+    fi
+}
