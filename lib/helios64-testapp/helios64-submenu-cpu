@@ -4,18 +4,19 @@
 EXECNAME=tacpu
 WORKDIR="/run/helios64_test"
 PIDFILE="${WORKDIR}/${EXECNAME}.pid"
-CPU_PROC_ID=0
 
 helios64_cpu_state=off
 
 helios64_cpu_freq_reset()
 {
-    cpufreq-set -r -g performance
+    cpufreq-set -r -g performance -c 0
+    cpufreq-set -r -g performance -c 4
 }
 
 helios64_cpu_freq_restore()
 {
-    cpufreq-set -r -g ondemand
+    cpufreq-set -r -g ondemand -c 0
+    cpufreq-set -r -g ondemand -c 4
 }
 
 helios64_cpu_test_run()
@@ -37,10 +38,20 @@ helios64_cpu_test_stop()
     PROC_PID=$(cat $PIDFILE 2>/dev/null)
     if [[ -n "${PROC_PID}" ]]; then
         kill ${PROC_PID}
+        pkill -f stress-ng
         rm -f $PIDFILE
     fi
 
     helios64_cpu_state=off
+}
+
+helios64_cpu_test_status()
+{
+    if [[ $helios64_cpu_state = "off" ]]; then
+        echo "Stopped"
+    else
+        echo "Running"
+    fi
 }
 
 helios64_menu_cpu()
