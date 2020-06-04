@@ -22,6 +22,7 @@ status_monitor()
         echo "$status" >> ${WORKDIR}/status-test-$dev.log
         echo "$status" >> ${WORKDIR}/status-test-$dev.log
         echo "$status" >> ${WORKDIR}/status-test-$dev.log
+        sync
         prev_status+=("$status")
     done
 
@@ -40,6 +41,7 @@ status_monitor()
 
             if [[ ${prev_status[index]} != $status ]]; then
                 echo "$status" >> ${WORKDIR}/status-test-$dev.log
+                sync
                 prev_status[$index]="$status"
             fi
 
@@ -103,7 +105,8 @@ helios64_menu_status()
 
     status_monitor &
     pid_monitor=$!
-    sleep 1
+    sync
+    sleep 2
 
     status_show
 
