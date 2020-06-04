@@ -24,7 +24,7 @@ helios64_cpu_test_run()
     local PROC_PID
 
     [[ -d $WORKDIR ]] || mkdir -p ${WORKDIR}
-    stress-ng --cpu $(nproc) --cpu-load 90 2>&1 &
+    stress-ng --cpu $(nproc) --cpu-load 90 >/dev/null 2>&1 &
     PROC_PID=$!
     echo ${PROC_PID} > $PIDFILE
 

@@ -51,6 +51,7 @@ start_all()
     helios64_menu_uSD all
     helios64_menu_emmc all
     helios64_menu_usb all
+    helios64_menu_cpu
 }
 
 main()
