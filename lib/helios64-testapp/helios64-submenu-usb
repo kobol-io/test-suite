@@ -8,7 +8,7 @@ TASTORAGE_EXEC="tastorage64"
 
 helios64_usb_test_run()
 {
-    echo "Starting $1"
+    #echo "Starting $1"
     $TASTORAGE_EXEC start $1
     return 0
 }
@@ -31,8 +31,6 @@ helios64_usb_stop_all()
 helios64_usb_test_apply()
 {
     local list_stop list_start
-
-    clear
 
     #set -x
     if [[ $# -eq 0 ]]; then
@@ -110,7 +108,10 @@ helios64_menu_usb()
     local returncode
 
     if [ "$1" = "all" ]; then
+        dialog --ascii-lines --title "Please wait" --infobox \
+        "\nStarting USB test" 5 30
         helios64_usb_test_apply $helios64_usb_list
+        sleep 2
         return 0
     fi
 

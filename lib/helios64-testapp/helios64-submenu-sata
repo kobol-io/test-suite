@@ -11,7 +11,7 @@ TASTORAGE_EXEC="tastorage64"
 
 helios64_sata_test_run()
 {
-    echo "Starting $1"
+    #echo "Starting $1"
     $TASTORAGE_EXEC start $1
     return 0
 }
@@ -34,8 +34,6 @@ helios64_sata_stop_all()
 helios64_sata_test_apply()
 {
     local list_stop list_start
-
-    clear
 
     #set -x
     if [[ $# -eq 0 ]]; then
@@ -125,7 +123,10 @@ helios64_menu_sata()
     local returncode
 
     if [ "$1" = "all" ]; then
+        dialog --ascii-lines --title "Please wait" --infobox \
+        "\nStarting SATA test" 5 30
         helios64_sata_test_apply $helios64_sata_list
+        sleep 2
         return 0
     fi
 
