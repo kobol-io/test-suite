@@ -1,12 +1,16 @@
 #!/bin/bash
 
 WORKDIR="/run/helios64_test/status"
+LOCKFILE="$WORKDIR/lock"
 
 status_monitor()
 {
     local devices prev_status dev index
     devices="ata1 ata2 ata3 ata4 ata5 microsd emmc usb1 usb2 usb3 usb4 dp cpu"
     prev_status=()
+
+    exec 200<$LOCKFILE
+    flock -x 200
 
     for dev in $devices
     do
@@ -25,6 +29,8 @@ status_monitor()
         sync
         prev_status+=("$status")
     done
+
+    flock -u 200
 
     while [ true ]
     do
@@ -102,11 +108,13 @@ helios64_menu_status()
     [[ -d $WORKDIR ]] || mkdir -p ${WORKDIR}
     # Disable CPU status
     #echo "N/A" >>${WORKDIR}/status-test-cpu.log
+    exec 100>$LOCKFILE
 
     status_monitor &
     pid_monitor=$!
     sync
     sleep 2
+    flock -w 10 100
 
     status_show
 
