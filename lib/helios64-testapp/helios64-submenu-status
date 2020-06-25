@@ -70,51 +70,51 @@ status_show()
 {
     dialog  --ascii-lines --no-shadow \
         --begin 0 0 --title "Status: CPU" \
-            --tailboxbg ${WORKDIR}/status-test-cpu.log 4 20 \
+            --tailboxbg ${WORKDIR}/status-test-cpu.log 4 24 \
         --and-widget \
         --begin 4 0 --ascii-lines --title "Status: microSD" \
-            --tailboxbg ${WORKDIR}/status-test-microsd.log 4 20 \
+            --tailboxbg ${WORKDIR}/status-test-microsd.log 4 24 \
         --and-widget \
         --begin 8 0 --ascii-lines --title "Status: eMMC" \
-            --tailboxbg ${WORKDIR}/status-test-emmc.log 4 20 \
+            --tailboxbg ${WORKDIR}/status-test-emmc.log 4 24 \
         --and-widget \
         --begin 12 0 --ascii-lines --title "Status: eth0" \
-            --tailboxbg ${WORKDIR}/status-test-eth0.log 4 20 \
+            --tailboxbg ${WORKDIR}/status-test-eth0.log 4 24 \
         --and-widget \
         --begin 16 0 --ascii-lines --title "Status: eth1" \
-            --tailboxbg ${WORKDIR}/status-test-eth1.log 4 20 \
+            --tailboxbg ${WORKDIR}/status-test-eth1.log 4 24 \
         --and-widget \
-        --begin 0 21 --ascii-lines --title "Status: ata1" \
-            --tailboxbg ${WORKDIR}/status-test-ata1.log 4 20 \
+        --begin 0 25 --ascii-lines --title "Status: ata1" \
+            --tailboxbg ${WORKDIR}/status-test-ata1.log 4 24 \
         --and-widget \
-        --begin 4 21 --ascii-lines --title "Status: ata2" \
-            --tailboxbg ${WORKDIR}/status-test-ata2.log 4 20 \
+        --begin 4 25 --ascii-lines --title "Status: ata2" \
+            --tailboxbg ${WORKDIR}/status-test-ata2.log 4 24 \
         --and-widget \
-        --begin 8 21 --ascii-lines --title "Status: ata3" \
-            --tailboxbg ${WORKDIR}/status-test-ata3.log 4 20 \
+        --begin 8 25 --ascii-lines --title "Status: ata3" \
+            --tailboxbg ${WORKDIR}/status-test-ata3.log 4 24 \
         --and-widget \
-        --begin 12 21 --ascii-lines --title "Status: ata4" \
-            --tailboxbg ${WORKDIR}/status-test-ata4.log 4 20 \
+        --begin 12 25 --ascii-lines --title "Status: ata4" \
+            --tailboxbg ${WORKDIR}/status-test-ata4.log 4 24 \
         --and-widget \
-        --begin 16 21 --ascii-lines --title "Status: ata5" \
-            --tailboxbg ${WORKDIR}/status-test-ata5.log 4 20 \
+        --begin 16 25 --ascii-lines --title "Status: ata5" \
+            --tailboxbg ${WORKDIR}/status-test-ata5.log 4 24 \
         --and-widget \
-        --begin 0 42 --ascii-lines --title "Status: usb1" \
-            --tailboxbg ${WORKDIR}/status-test-usb1.log 4 20 \
+        --begin 0 50 --ascii-lines --title "Status: usb1" \
+            --tailboxbg ${WORKDIR}/status-test-usb1.log 4 24 \
         --and-widget \
-        --begin 4 42 --ascii-lines --title "Status: usb2" \
-            --tailboxbg ${WORKDIR}/status-test-usb2.log 4 20 \
+        --begin 4 50 --ascii-lines --title "Status: usb2" \
+            --tailboxbg ${WORKDIR}/status-test-usb2.log 4 24 \
         --and-widget \
-        --begin 8 42 --ascii-lines --title "Status: usb3" \
-            --tailboxbg ${WORKDIR}/status-test-usb3.log 4 20 \
+        --begin 8 50 --ascii-lines --title "Status: usb3" \
+            --tailboxbg ${WORKDIR}/status-test-usb3.log 4 24 \
         --and-widget \
-        --begin 12 42 --ascii-lines --title "Status: Type-C Host" \
-            --tailboxbg ${WORKDIR}/status-test-usb4.log 4 20 \
+        --begin 12 50 --ascii-lines --title "Status: Type-C Host" \
+            --tailboxbg ${WORKDIR}/status-test-usb4.log 4 24 \
         --and-widget \
-        --begin 16 42 --ascii-lines --title "Status: Type-C DP" \
-            --tailboxbg ${WORKDIR}/status-test-dp.log 4 20 \
+        --begin 16 50 --ascii-lines --title "Status: Type-C DP" \
+            --tailboxbg ${WORKDIR}/status-test-dp.log 4 24 \
         --and-widget \
-        --begin 20 0 --no-shadow --ascii-lines --ok-label "Return" --msgbox "" 3 62
+        --begin 20 0 --no-shadow --ascii-lines --ok-label "Return" --msgbox "" 3 74
 }
 
 helios64_menu_status()
