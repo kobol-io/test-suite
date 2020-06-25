@@ -1,0 +1,118 @@
+#!/bin/bash
+
+EXECNAME=$(basename $0)
+WORKDIR="/run/helios64_test"
+DEVICE_LIST="eth0 eth1"
+BRD_ADDR=""
+FORCE_RUN=0
+PACKET_SIZE=1400
+
+get_broadcast_address()
+{
+    local dev devname
+
+    devname=$1
+    BRD_ADDR=$(ip addr show dev $devname |grep -w inet |awk '{ print $4}')
+}
+
+check_device_name()
+{
+    local dev devname
+
+    devname=$1
+    for dev in ${DEVICE_LIST}; do
+        [[ $devname = $dev ]] && return 0
+    done
+
+    echo "DEVICE unknown"
+    return 1
+}
+
+check_instance()
+{
+    local PROC_PID
+
+    if [[ -e $PIDFILE ]]; then
+        PROC_PID=$(cat $PIDFILE)
+        if [[ -n "${PROC_PID}" ]] && [[ -d "/proc/${PROC_PID}" ]]; then
+            echo "Another test already running"
+            exit 1
+        fi
+    fi
+}
+
+run_ping()
+{
+    local PROC_PID
+
+    if [[ ${FORCE_RUN} -ne 1 ]]; then
+        check_instance
+    fi
+
+    get_broadcast_address $1
+
+    ping -b ${BRD_ADDR} -I $1 -s ${PACKET_SIZE} \
+    > /run/ping_test_$1.log 2>&1 &
+
+    PROC_PID=$!
+    echo ${PROC_PID} > $PIDFILE
+}
+
+stop_ping()
+{
+    local PROC_PID
+
+    PROC_PID=$(cat $PIDFILE 2>/dev/null)
+    if [[ -n "${PROC_PID}" ]]; then
+        kill ${PROC_PID}
+        rm -f $PIDFILE
+    fi
+}
+
+status_ping()
+{
+    local PROC_PID
+
+    PROC_PID=$(cat $PIDFILE 2>/dev/null)
+    if [[ -n "${PROC_PID}" ]] && [[ -d "/proc/${PROC_PID}" ]]; then
+        echo "Running"
+    else
+        echo "Stopped"
+    fi
+}
+
+show_help()
+{
+    echo "Usage: ${EXEC_NAME} {start|stop|status} {DEVICE}"
+    echo
+    echo "       DEVICE LIST"
+    echo "       ==========="
+    for dev in ${DEVICE_LIST}; do
+        echo "       $dev"
+    done
+    echo
+}
+
+[[ -d $WORKDIR ]] || mkdir -p ${WORKDIR}
+
+[[ $# -ne 2 ]] && { show_help; exit 1;}
+device_name=$2
+check_device_name ${device_name}
+[[ $? -eq 0 ]] || { show_help; exit 1;}
+
+PIDFILE="${WORKDIR}/${EXECNAME}_${device_name}.pid"
+case "$1" in
+    start)
+        run_ping ${device_name}
+        ;;
+    stop)
+        stop_ping ${device_name}
+        ;;
+    status)
+        status_ping ${device_name}
+        ;;
+    *)
+        show_help
+        exit 1
+        ;;
+esac

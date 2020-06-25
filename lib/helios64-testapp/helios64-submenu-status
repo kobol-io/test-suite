@@ -6,7 +6,7 @@ LOCKFILE="$WORKDIR/lock"
 status_monitor()
 {
     local devices prev_status dev index
-    devices="ata1 ata2 ata3 ata4 ata5 microsd emmc usb1 usb2 usb3 usb4 dp cpu"
+    devices="ata1 ata2 ata3 ata4 ata5 microsd emmc usb1 usb2 usb3 usb4 dp cpu eth0 eth1"
     prev_status=()
 
     exec 200<$LOCKFILE
@@ -18,6 +18,10 @@ status_monitor()
             status=$(tagpu status)
         elif [[ $dev == "cpu" ]]; then
             status=$(helios64_cpu_test_status)
+        elif [[ $dev == "eth0" ]]; then
+            status=$(tanet status $dev)
+        elif [[ $dev == "eth1" ]]; then
+            status=$(tanet status $dev)
         else
             status=$(tastorage64 status $dev)
         fi
@@ -40,7 +44,11 @@ status_monitor()
             if [[ $dev == "dp" ]]; then
                 status=$(tagpu status)
             elif [[ $dev == "cpu" ]]; then
-        	status=$(helios64_cpu_test_status)
+        	    status=$(helios64_cpu_test_status)
+        	elif [[ $dev == "eth0" ]]; then
+        	    status=$(tanet status $dev)
+        	elif [[ $dev == "eth1" ]]; then
+        	    status=$(tanet status $dev)
             else
                 status=$(tastorage64 status $dev)
             fi
@@ -70,11 +78,11 @@ status_show()
         --begin 8 0 --ascii-lines --title "Status: eMMC" \
             --tailboxbg ${WORKDIR}/status-test-emmc.log 4 20 \
         --and-widget \
-        --begin 12 0 --ascii-lines --title "Status: Type-C Host" \
-            --tailboxbg ${WORKDIR}/status-test-usb4.log 4 20 \
+        --begin 12 0 --ascii-lines --title "Status: eth0" \
+            --tailboxbg ${WORKDIR}/status-test-eth0.log 4 20 \
         --and-widget \
-        --begin 16 0 --ascii-lines --title "Status: Type-C DP" \
-            --tailboxbg ${WORKDIR}/status-test-dp.log 4 20 \
+        --begin 16 0 --ascii-lines --title "Status: eth1" \
+            --tailboxbg ${WORKDIR}/status-test-eth1.log 4 20 \
         --and-widget \
         --begin 0 21 --ascii-lines --title "Status: ata1" \
             --tailboxbg ${WORKDIR}/status-test-ata1.log 4 20 \
@@ -99,6 +107,12 @@ status_show()
         --and-widget \
         --begin 8 42 --ascii-lines --title "Status: usb3" \
             --tailboxbg ${WORKDIR}/status-test-usb3.log 4 20 \
+        --and-widget \
+        --begin 12 42 --ascii-lines --title "Status: Type-C Host" \
+            --tailboxbg ${WORKDIR}/status-test-usb4.log 4 20 \
+        --and-widget \
+        --begin 16 42 --ascii-lines --title "Status: Type-C DP" \
+            --tailboxbg ${WORKDIR}/status-test-dp.log 4 20 \
         --and-widget \
         --begin 20 0 --no-shadow --ascii-lines --ok-label "Return" --msgbox "" 3 62
 }

@@ -8,6 +8,7 @@ APP_NAME="Helios64 Test Suite"
 APP_VERSION="0.1"
 
 source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-cpu
+source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-net
 source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-sata
 source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-uSD
 source "$INSTALL_PATH"../lib/helios64-testapp/helios64-submenu-emmc
@@ -21,6 +22,7 @@ init_env()
     pkill -f fio
     pkill -f stress-ng
     pkill -f glmark2
+    pkill -f ping
 
     # Reset CPU Freq
     helios64_cpu_freq_reset
@@ -29,6 +31,7 @@ init_env()
 restore_env()
 {
     helios64_cpu_test_stop
+    helios64_net_stop_all 2>&1 1>/dev/null
     helios64_sata_stop_all 2>&1 1>/dev/null
     helios64_uSD_stop_all 2>&1 1>/dev/null
     helios64_emmc_stop_all 2>&1 1>/dev/null
@@ -47,6 +50,7 @@ display_version()
 
 start_all()
 {
+    helios64_menu_net all
     helios64_menu_sata all
     helios64_menu_uSD all
     helios64_menu_emmc all
@@ -69,6 +73,7 @@ main()
 
     ITEMS=()
     ITEMS+=( "CPU"      "Run CPU Stress"  )
+    ITEMS+=( "Ethernet" "Run Ethernet (J11 & J12) test"  )
     ITEMS+=( "SATA"     "Run SATA (J2-J6, J8)test >>" )
     ITEMS+=( "MicroSD"  "Run MicroSD (J14) test" )
     ITEMS+=( "eMMC"  	"Run eMMC (U39) test" )
@@ -85,7 +90,7 @@ main()
             $EXTRAARGS \
             --ok-label "Select" --cancel-label "Exit" \
             --menu "\nSimple User Interface to exercise Helios64 components.\n\nPlease select which component to test or select \"Status\"\nto display test status." \
-            18 60 20 "${ITEMS[@]}" \
+            20 60 20 "${ITEMS[@]}" \
             2>&1 1>&3)
 
         returncode=$?
@@ -94,6 +99,9 @@ main()
         case $value in
         	"CPU")
                 helios64_menu_cpu
+	        	;;
+	        "Ethernet")
+                helios64_menu_net
 	        	;;
 	        "SATA")
                 helios64_menu_sata

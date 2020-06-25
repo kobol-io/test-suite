@@ -1,0 +1,121 @@
+#!/bin/bash
+
+helios64_net_state[1]=off
+helios64_net_state[2]=off
+helios64_net_list="eth0 eth1"
+TANET_EXEC="tanet"
+
+helios64_net_test_run()
+{
+    #echo "Starting $1"
+    $TANET_EXEC start $1
+    return 0
+}
+
+helios64_net_test_stop()
+{
+    echo "Stopping $1"
+    $TANET_EXEC stop $1
+    return 0
+}
+
+helios64_net_stop_all()
+{
+    for stop in $helios64_net_list
+    do
+        helios64_net_test_stop $stop
+    done
+}
+
+helios64_net_test_apply()
+{
+    local list_stop list_start
+
+    if [[ $# -eq 0 ]]; then
+        return 0
+    fi
+
+    while (( "$#" )); do
+        list_start=$(echo "$list_start $1")
+        shift
+    done
+
+    # Get list of device to stop
+    for stop in $helios64_net_list
+    do
+        is_stop=1
+        for start in $list_start
+        do
+            if [[ $stop = $start ]]; then
+                is_stop=0
+                break
+            fi
+        done
+
+        [[ $is_stop -eq 1 ]] && list_stop=$(echo "$list_stop $stop")
+    done
+
+    # Stop test
+    for stop in $list_stop
+    do
+        case $stop in
+            "eth0")
+               helios64_net_state[1]=off
+               ;;
+            "eth1")
+               helios64_net_state[2]=off
+               ;;
+        esac
+
+        helios64_net_test_stop $stop
+    done
+
+    # Start test
+    for start in $list_start
+    do
+        case $start in
+            "eth0")
+               helios64_net_state[1]=on
+               ;;
+            "eth1")
+               helios64_net_state[2]=on
+               ;;
+        esac
+
+        helios64_net_test_run $start
+    done
+
+    return 0
+}
+
+helios64_menu_net()
+{
+    local returncode
+
+    if [ "$1" = "all" ]; then
+        dialog --ascii-lines --title "Please wait" --infobox \
+        "\nStarting Ethernet test" 5 30
+        helios64_net_test_apply $helios64_net_list
+        sleep 1
+        return 0
+    fi
+
+    while true
+    do
+        exec 3>&1
+        value=$(dialog --ascii-lines --ok-label "Apply" \
+            --cancel-label "Return" \
+            --checklist "Select Ethernet Port (J11 & J12) to test" \
+            10 50 4 \
+            "eth0" "1G Ethernet Port (J11)" ${helios64_net_state[1]} \
+            "eth1" "2.5G Ethernet Port (J12)" ${helios64_net_state[2]} \
+            2>&1 1>&3)
+
+        returncode=$?
+        exec 3>&-
+
+        [[ $returncode == $DIALOG_CANCEL || $returncode == $DIALOG_ESC ]] && clear && return 1
+
+        helios64_net_test_apply $value
+    done
+}
