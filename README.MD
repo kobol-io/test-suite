@@ -2,13 +2,13 @@
 ### Helios4
 Install as superuser
 ```
-$ git clone https://github.com/helios-4/test-suite.git
+$ git clone https://github.com/kobol-io/test-suite.git
 $ sudo ./install.sh -b helios4
 ```
 ### Helios64
 Install as superuser
 ```
-$ git clone https://github.com/helios-4/test-suite.git
+$ git clone https://github.com/kobol-io/test-suite.git
 $ sudo ./install.sh -b helios64
 ```
 ---
