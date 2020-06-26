@@ -32,7 +32,7 @@ board_install()
 		"helios64")
 			DEPS="$COMMON_DEPS iperf evtest cpufrequtils mesa-utils glmark2"
 			SRC_LIBS="helios64-testapp"
-			SRC_SBINS="helios64_test tastorage64 tagpu"
+			SRC_SBINS="helios64_test tastorage64 tagpu tanet"
 			;;
 		*)
 			exit
